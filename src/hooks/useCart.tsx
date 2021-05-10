@@ -75,10 +75,10 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     try {
       const newCart = [...cart];
 
-      const productExists = newCart.find(product => product.id === productId );
+      const productIndex = newCart.findIndex(product => product.id === productId );
 
-      if(productExists){
-        newCart.filter( product => product.id === productId)
+      if(productIndex >= 0){
+        newCart.splice(productIndex,1)
         
       } else {
         toast.error('Erro na remoção do produto');
@@ -100,31 +100,38 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       const newCart = [...cart];
 
       const productExists = newCart.find(product => product.id === productId );
+      const productIndex = newCart.findIndex(product => product.id === productId )
 
       const stock = await api.get(`/stock/${productId}`);
       const stockAmount = stock.data.amount;
       
       if(productExists){
-        const newAmount = productExists.amount + amount;
-        if(newAmount < 1)
+        // const newAmount = productExists.amount + amount;
+        if(amount < 1)
         {
           toast.error('Quantidade do produto não pode ser menor que 1');
           return;
         }
-        else if(amount < stockAmount) {
+        else if(amount > stockAmount) {
           toast.error('Quantidade solicitada fora de estoque');
           return;
         }
 
-        productExists.amount = newAmount;
+        newCart.splice(productIndex,1)
+
+        const productUpdated = {
+          ...productExists,
+          amount
+        }
+        newCart.push(productUpdated);
+  
+        setCart(newCart);
+        localStorage.setItem('@RocketShoes:cart', JSON.stringify(newCart))
 
       } else {
         toast.error('Erro na alteração de quantidade do produto');
         return;
       }
-
-      setCart(newCart);
-      localStorage.setItem('@RocketShoes:cart', JSON.stringify(newCart))
     } catch {    
       toast.error('Erro na alteração de quantidade do produto');
     }
