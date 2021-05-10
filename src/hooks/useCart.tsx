@@ -100,7 +100,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       const newCart = [...cart];
 
       const productExists = newCart.find(product => product.id === productId );
-      const productIndex = newCart.findIndex(product => product.id === productId )
+      // const productIndex = newCart.findIndex(product => product.id === productId )
 
       const stock = await api.get(`/stock/${productId}`);
       const stockAmount = stock.data.amount;
@@ -117,14 +117,17 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
           return;
         }
 
-        newCart.splice(productIndex,1)
+        // newCart.splice(productIndex,1)
 
-        const productUpdated = {
-          ...productExists,
-          amount
-        }
-        newCart.push(productUpdated);
+        // const productUpdated = {
+        //   ...productExists,
+        //   amount
+        // }
+          
+        // newCart.push(productUpdated);
   
+        productExists.amount = amount;
+
         setCart(newCart);
         localStorage.setItem('@RocketShoes:cart', JSON.stringify(newCart))
 
